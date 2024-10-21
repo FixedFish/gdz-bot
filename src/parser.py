@@ -29,6 +29,9 @@ class Parser:
         return [sr.get("href") for sr in sctr]
 
     def get_solved_task_img(self, url: str) -> List[str]:
+        """
+You should pass a number of task using url + "n-nom" for now, because other textbook have other links to tasks
+        """
         new_url = self.base_url + url
         page = self._get_html(new_url)
         soup = self._get_soup(page)
