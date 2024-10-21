@@ -3,31 +3,23 @@ from bs4 import BeautifulSoup
 
 
 class Parser:
-    def __init__(self, link):
-        self.url = link
-        self.html = requests.get(self.url).content
-        self.soup = BeautifulSoup(self.html, 'html.parser')
+    def __init__(self):
+        self.base_url = "https://gdz.ru"
+
+    def _get_html(self, url):
+        return requests.get(url).content
+
+    def _get_soup(self, html):
+        return BeautifulSoup(html, "html.parser")
 
     def get_items_by_grade(self, grade):
-        selector = self.soup.select_one(f'.sidebar__main > div:nth-child(1) > ul:nth-child({grade})')
-        hrefs = [link.get('href') for link in selector.find_all('a')]
-        for href in hrefs:
-            print(href)
-
-    def get_books_by_grade(self, grade, item):
-        href = []
-        page = requests.get(f'https://gdz.ru/class-{grade}/geometria').content
-        soup = BeautifulSoup(page, 'html.parser')
-        books = soup.select('li.book__item > a:nth-child(1)')
-        for book in books:
-            href.append(book)
-        for h in href:
-            print(h['href'])
+        page = self._get_html(self.base_url)
+        soup = self._get_soup(page)
+        sr = soup.select_one(f".sidebar__main > div:nth-child(1) > ul:nth-child({grade})")
+        return [link.get("href") for link in sr.find_all("a") if link.get("href") is not None]
 
 
-
-if __name__ == '__main__':
-    url = 'https://gdz.ru'
-    parser = Parser(url)
-    parser.get_items_by_grade(9)
-    parser.get_books_by_grade(9, 0)
+if __name__ == "__main__":
+    fish = Parser()
+    available_items = fish.get_items_by_grade(9)
+    print(available_items[0])
